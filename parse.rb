@@ -1,5 +1,4 @@
 require './person'
-require 'pry'
 
 class Parse
 
@@ -9,7 +8,7 @@ class Parse
     elsif gender.strip == "F"
       "Female"
     else
-      # gender is not valid so return false and do not create person
+      # gender is not valid so return false and do not create person if implementing future validation
       false
     end
   end
@@ -46,15 +45,4 @@ class Parse
     end
   end
 
-
-
 end
-
-# Parse.parse_csv File.read("data/comma_delimited.txt")
-# Parse.parse_space_delimited File.read("data/space_delimited.txt")
-# Parse.parse_pipe_delimited File.read("data/pipe_delimited.txt")
-#
-#
-# Person.all.each do |person|
-#   puts person.puts_person
-# end
