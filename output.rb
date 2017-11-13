@@ -1,25 +1,27 @@
 require "./person"
 require "./parse"
 require 'Date'
-require 'pry'
 
 class Output
 
   @@all = Person.all
-  @@test = []
+  @@file = File.open("results.txt", "w") {|f| f.puts ("Results:")}
 
-  def self.create_people_data
-    Parse.parse_csv File.read("data/comma_delimited.txt")
-    Parse.parse_space_delimited File.read("data/space_delimited.txt")
-    Parse.parse_pipe_delimited File.read("data/pipe_delimited.txt")
+  def self.create_people_data_from_files
+    Dir.entries("./data").each do |file|
+      if file == "comma_delimited.txt"
+        Parse.parse_csv File.read("data/#{file}")
+      elsif file == "pipe_delimited.txt"
+        Parse.parse_pipe_delimited File.read("data/#{file}")
+      elsif file == "space_delimited.txt"
+        Parse.parse_space_delimited File.read("data/#{file}")
+      end
+    end
   end
+
 
   def self.all
     @@all
-  end
-
-  def self.test
-    @@test
   end
 
   def self.sort_by_gender_and_lastname
@@ -40,7 +42,6 @@ class Output
     females.concat(males)
   end
 
-
   def self.sort_by_birthday
     self.all.sort do |a, b|
       Date.strptime(a.birthday, "%m/%d/%Y") <=> Date.strptime(b.birthday, "%m/%d/%Y")
@@ -51,32 +52,34 @@ class Output
     self.all.sort {|a,b| b.lastname <=> a.lastname }
   end
 
-  def self.main_output
-    self.create_people_data
-
-    puts "output 1 - sorted by gender and last name ascending
-    \n"
+  def self.write_sorted_by_gender_to_file
+    File.open("results.txt", "a") {|f| f.puts("\nOutput 1:")}
     self.sort_by_gender_and_lastname.each do |person|
-      puts person.print_person
+      File.open("results.txt", "a") {|f| f.puts(person.print_person)}
     end
-
-    puts "\noutput 2 - sorted by birth date, ascending
-    \n"
-    self.sort_by_birthday.each do |person|
-      puts person.print_person
-    end
-
-    puts "\noutput 3 - sorted by last name, descending
-    \n"
-    self.sort_by_lastname.each do |person|
-      puts person.print_person
-    end
-
-
   end
 
+  def self.write_sorted_by_birthdate_to_file
+    File.open("results.txt", "a") {|f| f.puts("\nOutput 2:")}
+    self.sort_by_birthday.each do |person|
+      File.open("results.txt", "a") {|f| f.puts(person.print_person)}
+    end
+  end
 
+  def self.write_sorted_by_lastname_to_file
+    File.open("results.txt", "a") {|f| f.puts("\nOutput 3:")}
+    self.sort_by_lastname.each do |person|
+      File.open("results.txt", "a") {|f| f.puts(person.print_person)}
+    end
+  end
+
+  def self.main_results_writer
+    self.create_people_data_from_files
+    self.write_sorted_by_gender_to_file
+    self.write_sorted_by_birthdate_to_file
+    self.write_sorted_by_lastname_to_file
+  end
 
 end
 
-Output.main_output
+Output.main_results_writer
